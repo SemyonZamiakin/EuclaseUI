@@ -1,48 +1,40 @@
-<div align="center">
+# QuasarUI
 
-# ⚡ QuasarUI
+Dependency-free C++ UI toolkit for SPI TFT displays (ESP32 / Arduino): RGB565 framebuffer, dirty-rectangle flushing, and a small set of widgets.
 
-**Draw once. Send only what changed.**
-A tiny, dependency-free UI toolkit for SPI TFTs — framebuffer, dirty-rectangle flushing, gauges, graphs and widgets in a few hundred lines of portable C++.
+[![CI](https://github.com/SemyonZamiakin/QuasarUI/actions/workflows/ci.yml/badge.svg)](https://github.com/SemyonZamiakin/QuasarUI/actions/workflows/ci.yml)
+![license](https://img.shields.io/badge/license-MIT-blue)
+![language](https://img.shields.io/badge/C%2B%2B-11-informational)
+![panels](https://img.shields.io/badge/panels-ST7789%20%7C%20ILI9341-informational)
 
-![license](https://img.shields.io/badge/license-MIT-7c5cff)
-![platform](https://img.shields.io/badge/platform-ESP32%20%7C%20Arduino-22d3ee)
-![panels](https://img.shields.io/badge/panels-ST7789%20%7C%20ILI9341-3cdc6e)
-![tests](https://img.shields.io/badge/host%20tests-38%20checks-ffd23c)
-![deps](https://img.shields.io/badge/dependencies-none-ff9628)
+<img src="docs/img/demo.gif" width="480" alt="QuasarUI demo dashboard rendered by the host simulator">
 
-<img src="docs/img/demo.gif" width="480" alt="QuasarUI dashboard demo">
+*Output of the bundled host simulator running the library code against a virtual ILI9341 (2x upscaled). These are not photographs of hardware; see [Status](#status).*
 
-<sub>Rendered by the bundled host simulator running the <b>real library code</b> against a virtual ILI9341 (2× upscaled). See <a href="#honest-status">Honest status</a> — hardware photos are welcome via PR.</sub>
+## Overview
 
-</div>
+A full 320x240 frame over 40 MHz SPI takes about 31 ms. A typical dashboard changes one gauge, one label and one chart per tick, not the whole screen.
 
----
+QuasarUI keeps an RGB565 framebuffer in RAM, tracks which rectangle each widget touched, and transmits only those rectangles to the panel.
 
-## Why you'd want this
-
-Pushing a full 320×240 frame over 40 MHz SPI takes **~31 ms**. Most dashboards change a gauge, a label and a chart per tick — not the whole screen.
-
-QuasarUI keeps a RGB565 framebuffer in RAM, tracks what each widget touched, and sends **only those rectangles**:
-
-| Scenario (320×240, 40 MHz SPI, simulated) | Pixels sent | SPI time |
+| Scenario (320x240, 40 MHz SPI, simulated) | Pixels sent | SPI time |
 |---|---:|---:|
 | Full redraw | 76 800 | 30.7 ms |
-| Demo dashboard, *every* widget changing every frame | ~29 000 (38 %) | ~11.6 ms |
-| Idle frame (nothing changed) | **0** | **0 ms** |
-| One label update | ≤ label rect | ≪ 1 ms |
+| Demo dashboard, every widget changing on every frame | ~29 000 (38 %) | ~11.6 ms |
+| Idle frame (nothing changed) | 0 | 0 ms |
+| One label update | at most the label rectangle | well under 1 ms |
 
-Numbers come from `test/render_gallery.cpp` (it prints them); real throughput depends on your MCU and SPI driver.
+The numbers are produced by `test/render_gallery.cpp`. Real throughput depends on the MCU and its SPI driver.
 
-## Features
+## Design
 
-- **Transport abstraction** (`qs::Bus`) — the core never touches Arduino or IDF headers; swap in any SPI layer.
-- **Panels:** ST7789 (240×240, 240×320) and ILI9341 (240×320), 4 rotations, 240×240 RAM-offset handling.
-- **Canvas:** clipped primitives (rect, line, circle, round-rect, arc), scalable built-in 5×7 font, dirty-rect tracking.
-- **Widgets:** `Label`, `ProgressBar`, `Gauge` (270° dial), `Graph` (ring buffer, auto/fixed range, no heap), `Button`.
-- **`Screen`:** redraws only invalid widgets, one flush per widget so distant updates never merge into a giant rectangle.
-- **No heap use inside the library**; you own the framebuffer and graph storage.
-- **Host simulator + unit tests** — a virtual panel decodes `CASET/RASET/RAMWR`, so tests assert what reaches the glass.
+- **Transport abstraction (`qs::Bus`).** The core does not include Arduino or ESP-IDF headers. Any SPI layer can be plugged in by implementing five methods: `begin`, `reset`, `command`, `data`, `delayMs`.
+- **Panel drivers.** ST7789 (240x240, 240x320) and ILI9341 (240x320), four rotations, RAM-offset handling for 240x240 modules.
+- **Canvas.** Clipped primitives (rectangle, line, circle, rounded rectangle, arc), a scalable built-in 5x7 font, dirty-rectangle tracking.
+- **Widgets.** `Label`, `ProgressBar`, `Gauge` (270 degree dial), `Graph` (ring buffer, automatic or fixed range), `Button`.
+- **`Screen`.** Redraws only invalid widgets and flushes once per widget, so distant updates are never merged into one large rectangle.
+- **Memory.** No heap allocation inside the library. The caller owns the framebuffer and graph storage.
+- **Testability.** A virtual panel decodes `CASET` / `RASET` / `RAMWR`, so unit tests assert what would reach the glass.
 
 ## Quick start (Arduino-ESP32)
 
@@ -65,57 +57,68 @@ void setup() {
 }
 void loop() {
     temp.setValue(readTemperature());
-    screen->update();          // sends nothing if nothing changed
+    screen->update();          // transmits nothing if nothing changed
     delay(100);
 }
 ```
 
-Full sketch: [`examples/Dashboard`](examples/Dashboard/Dashboard.ino). Install by copying the folder into your Arduino `libraries/`, or via PlatformIO (`library.json`).
+Complete sketch: [`examples/Dashboard`](examples/Dashboard/Dashboard.ino). Install by copying the folder into the Arduino `libraries/` directory, or through PlatformIO (`library.json`).
 
-**Wiring (ESP32 VSPI):** SCK 18 · MOSI 23 · CS 5 · DC 2 · RST 4 · LED → 3V3.
+Wiring used by the example (ESP32 VSPI): SCK 18, MOSI 23, CS 5, DC 2, RST 4, LED to 3V3.
 
-## Memory
+### Memory
 
 | Display | Framebuffer |
 |---|---:|
-| 240×240 | 112.5 KB |
-| 320×240 | 150 KB |
+| 240x240 | 112.5 KB |
+| 320x240 | 150 KB |
 
-Allocate with `malloc` (not a static array) on ESP32 — static DRAM is limited. AVR boards (Uno/Nano) have far too little RAM for a full framebuffer; they are **not supported** by this version.
+Allocate the framebuffer with `malloc`, not as a static array: static DRAM on the ESP32 is limited. AVR boards (Uno, Nano) do not have enough RAM for a full framebuffer and are not supported.
 
-## Port to another platform
+### Porting
 
-Implement five methods of `qs::Bus` (`begin`, `reset`, `command`, `data`, `delayMs`). `ArduinoSpiBus` is ~50 lines; use it as a template for ESP-IDF `spi_master`, Pico SDK or Linux spidev.
+Implement the five `qs::Bus` methods for your platform. `ArduinoSpiBus` is about 50 lines and can serve as a template for ESP-IDF `spi_master`, the Pico SDK or Linux spidev.
 
-## Build & test on your PC
+## Build and test on a PC
 
 ```bash
 cmake -S . -B build && cmake --build build && ctest --test-dir build --output-on-failure
-./build/render_gallery ./out     # writes PPM frames + stats.csv
+./build/render_gallery ./out     # writes PPM frames and stats.csv
 ```
 
-or without CMake:
+Without CMake:
 
 ```bash
 g++ -std=c++11 -O2 test/test_main.cpp src/qs_panel.cpp src/qs_canvas.cpp src/qs_font5x7.cpp src/qs_widgets.cpp -o tests && ./tests
 ```
 
-## Honest status
+CI builds with `-Wall -Wextra` and AddressSanitizer / UndefinedBehaviorSanitizer on every push.
+
+## Status
 
 | Area | State |
 |---|---|
-| Core, widgets, dirty-rect flush | ✅ unit-tested on host (38 checks, GCC 6.3 `-Wall -Wextra`) |
-| ST7789 / ILI9341 init sequences | ⚠️ standard vendor sequences, **not yet verified on physical panels** |
-| `ArduinoSpiBus` | ⚠️ **not yet compiled/tested on a board** |
-| ESP-IDF `Bus` implementation | ❌ not included yet (CMake component builds the core) |
-| Images in this README | Simulator renders, **not** photos of hardware |
+| Core, widgets, dirty-rectangle flush | Unit-tested on the host: 38 checks, GCC with `-Wall -Wextra`, sanitizers in CI |
+| ST7789 / ILI9341 initialisation sequences | Standard vendor sequences. **Not verified on physical panels yet** |
+| `ArduinoSpiBus` | **Not compiled or tested on a board yet** |
+| ESP-IDF `Bus` implementation | Not included (the CMake component builds the core only) |
+| Images in this README | Simulator output, not hardware photos |
 
-Tried it on real hardware? Open an issue or PR with your board, panel and a photo — that's the fastest way to move a ⚠️ to ✅.
+Hardware reports are the quickest way to move an item from "not verified" to "verified". If you ran it on a board, open an issue or a pull request with the board, the panel model and a photo.
 
 ## Roadmap
 
-ESP-IDF SPI bus with DMA · async flush · RGB565 sprites/bitmaps · more fonts · ST7735 / GC9A01 · touch input helpers.
+- ESP-IDF SPI bus with DMA
+- Asynchronous flush
+- RGB565 sprites and bitmaps
+- Additional fonts
+- ST7735 and GC9A01 panels
+- Touch input helpers
+
+## Contributing and security
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Release history: [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
-MIT © 2026 Quasar Soft
+MIT. Copyright 2026 Quasar Soft.
