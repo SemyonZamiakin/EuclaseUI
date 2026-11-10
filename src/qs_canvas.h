@@ -1,4 +1,4 @@
-// QuasarUI - RGB565 framebuffer with dirty-rectangle tracking.
+// EuclaseUI - RGB565 framebuffer with dirty-rectangle tracking.
 // Draw anywhere, call flush(): only the changed region goes over SPI.
 // Screen::update() flushes per widget so distant updates stay separate.
 #pragma once
@@ -16,8 +16,8 @@ namespace colors {
 constexpr Color Black = 0x0000, White = 0xFFFF;
 constexpr Color Red = rgb(255, 60, 60), Green = rgb(60, 220, 110), Blue = rgb(70, 140, 255);
 constexpr Color Yellow = rgb(255, 210, 60), Cyan = rgb(60, 220, 230), Orange = rgb(255, 150, 40);
-constexpr Color Grey = rgb(120, 126, 138), DarkGrey = rgb(34, 38, 48), Panel = rgb(16, 19, 28);
-constexpr Color Accent = rgb(124, 92, 255);
+constexpr Color Grey = rgb(143, 179, 188), DarkGrey = rgb(26, 60, 72), Panel = rgb(15, 41, 51);   // Euclase: slate, petrol tints
+constexpr Color Accent = rgb(45, 212, 191), Mint = rgb(153, 246, 228), Alabaster = rgb(248, 250, 252);   // aquamarine, mint, alabaster
 }  // namespace colors
 
 struct Rect {

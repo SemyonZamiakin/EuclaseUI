@@ -1,4 +1,4 @@
-# Contributing to QuasarUI
+# Contributing to EuclaseUI
 
 Thanks for your interest. Bug reports, hardware test reports and focused pull requests are welcome.
 

@@ -1,6 +1,6 @@
-// QuasarUI - Dashboard example (ESP32 + ILI9341 320x240, landscape)
+// EuclaseUI - Dashboard example (ESP32 + ILI9341 320x240, landscape)
 // Wiring (ESP32 default VSPI): SCK=18  MOSI=23  CS=5  DC=2  RST=4  LED->3V3
-#include <QuasarUI.h>
+#include <EuclaseUI.h>
 
 using namespace qs;
 
@@ -10,7 +10,7 @@ ArduinoSpiBus bus(SPI, /*cs*/ 5, /*dc*/ 2, /*rst*/ 4, 40000000UL);
 Panel panel(bus, PanelConfig::ILI9341_240x320());
 
 Label title({10, 8, 220, 16}, 2);
-Gauge temp(62, 100, 50, "TEMP C", colors::Orange);
+Gauge temp(62, 100, 50, "TEMP C", colors::Accent);
 ProgressBar bar({10, 168, 216, 12});
 int16_t samples[96];
 Graph graph({10, 190, 216, 44}, samples, 96);
@@ -37,7 +37,7 @@ void setup() {
     screen->add(&temp);
     screen->add(&bar);
     screen->add(&graph);
-    title.setText("QUASAR HUB");
+    title.setText("EUCLASE HUB");
     temp.setRange(0, 60);
     graph.setAutoRange();
 }

@@ -1,6 +1,6 @@
 // Host unit tests. Build: see test/Makefile-free instructions in README (g++ one-liner / CMake).
 #include "sim_bus.h"
-#include "../src/QuasarUI.h"
+#include "../src/EuclaseUI.h"
 #include "../src/qs_font5x7.h"
 #include <stdio.h>
 #include <string.h>
@@ -48,7 +48,7 @@ static void test_clipping_is_safe() {
 static void test_flush_matches_framebuffer() {
     Rig r;
     r.cv.fillRect(10, 20, 30, 40, rgb(255, 0, 0));
-    r.cv.drawText(100, 100, "Quasar", 0xFFFF, 0x0000, 2);
+    r.cv.drawText(100, 100, "Euclase", 0xFFFF, 0x0000, 2);
     r.cv.fillCircle(150, 60, 25, rgb(0, 255, 0));
     r.cv.flush(r.panel);
     CHECK(memcmp(r.bus.vram.data(), fbuf, sizeof fbuf) == 0);

@@ -1,13 +1,13 @@
-# QuasarUI
+# EuclaseUI
 
 Dependency-free C++ UI toolkit for SPI TFT displays (ESP32 / Arduino): RGB565 framebuffer, dirty-rectangle flushing, and a small set of widgets.
 
-[![CI](https://github.com/SemyonZamiakin/QuasarUI/actions/workflows/ci.yml/badge.svg)](https://github.com/SemyonZamiakin/QuasarUI/actions/workflows/ci.yml)
-![license](https://img.shields.io/badge/license-MIT-blue)
-![language](https://img.shields.io/badge/C%2B%2B-11-informational)
-![panels](https://img.shields.io/badge/panels-ST7789%20%7C%20ILI9341-informational)
+[![CI](https://github.com/SemyonZamiakin/EuclaseUI/actions/workflows/ci.yml/badge.svg)](https://github.com/SemyonZamiakin/EuclaseUI/actions/workflows/ci.yml)
+![license](https://img.shields.io/badge/license-MIT-2DD4BF?labelColor=0F2933)
+![language](https://img.shields.io/badge/C%2B%2B-11-2DD4BF?labelColor=0F2933)
+![panels](https://img.shields.io/badge/panels-ST7789%20%7C%20ILI9341-2DD4BF?labelColor=0F2933)
 
-<img src="docs/img/demo.gif" width="480" alt="QuasarUI demo dashboard rendered by the host simulator">
+<img src="docs/img/demo.gif" width="480" alt="EuclaseUI demo dashboard rendered by the host simulator">
 
 *Output of the bundled host simulator running the library code against a virtual ILI9341 (2x upscaled). These are not photographs of hardware; see [Status](#status).*
 
@@ -15,7 +15,7 @@ Dependency-free C++ UI toolkit for SPI TFT displays (ESP32 / Arduino): RGB565 fr
 
 A full 320x240 frame over 40 MHz SPI takes about 31 ms. A typical dashboard changes one gauge, one label and one chart per tick, not the whole screen.
 
-QuasarUI keeps an RGB565 framebuffer in RAM, tracks which rectangle each widget touched, and transmits only those rectangles to the panel.
+EuclaseUI keeps an RGB565 framebuffer in RAM, tracks which rectangle each widget touched, and transmits only those rectangles to the panel.
 
 | Scenario (320x240, 40 MHz SPI, simulated) | Pixels sent | SPI time |
 |---|---:|---:|
@@ -39,13 +39,13 @@ The numbers are produced by `test/render_gallery.cpp`. Real throughput depends o
 ## Quick start (Arduino-ESP32)
 
 ```cpp
-#include <QuasarUI.h>
+#include <EuclaseUI.h>
 using namespace qs;
 
 ArduinoSpiBus bus(SPI, /*cs*/5, /*dc*/2, /*rst*/4, 40000000UL);
 Panel  panel(bus, PanelConfig::ILI9341_240x320());
 Label  title({10, 8, 220, 16}, 2);
-Gauge  temp(62, 100, 50, "TEMP C", colors::Orange);
+Gauge  temp(62, 100, 50, "TEMP C", colors::Accent);
 Canvas* canvas; Screen* screen;
 
 void setup() {
@@ -53,7 +53,7 @@ void setup() {
     panel.begin();  panel.setRotation(1);
     screen = new Screen(*canvas, panel);
     screen->add(&title); screen->add(&temp);
-    title.setText("QUASAR HUB");  temp.setRange(0, 60);
+    title.setText("EUCLASE HUB");  temp.setRange(0, 60);
 }
 void loop() {
     temp.setValue(readTemperature());
@@ -121,4 +121,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). Release h
 
 ## License
 
-MIT. Copyright 2026 Quasar Soft.
+MIT. Copyright 2026 Euclase.

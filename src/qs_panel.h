@@ -1,4 +1,4 @@
-// QuasarUI - SPI TFT panel controller driver (ST7789, ILI9341).
+// EuclaseUI - SPI TFT panel controller driver (ST7789, ILI9341).
 #pragma once
 #include "qs_bus.h"
 

@@ -1,4 +1,4 @@
-// QuasarUI - transport abstraction.
+// EuclaseUI - transport abstraction.
 // The whole library talks to the display through this tiny interface, so the
 // core is portable (Arduino, ESP-IDF, host simulator) and unit-testable.
 #pragma once

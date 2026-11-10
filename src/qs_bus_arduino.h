@@ -1,4 +1,4 @@
-// QuasarUI - Arduino SPI transport (AVR/ESP32/ESP8266/RP2040/STM32 cores).
+// EuclaseUI - Arduino SPI transport (AVR/ESP32/ESP8266/RP2040/STM32 cores).
 #pragma once
 #if defined(ARDUINO)
 #include <Arduino.h>

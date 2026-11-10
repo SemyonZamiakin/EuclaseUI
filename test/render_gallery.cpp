@@ -2,7 +2,7 @@
 // panel and writes PPM frames + a stats table. Used for README images.
 // Usage: render_gallery <outdir>
 #include "sim_bus.h"
-#include "../src/QuasarUI.h"
+#include "../src/EuclaseUI.h"
 #include <math.h>
 #include <stdio.h>
 #include <string>
@@ -20,26 +20,26 @@ int main(int argc, char** argv) {
     panel.setRotation(1);  // 320x240 landscape
     Canvas cv(fbuf, W, H);
 
-    Label title({10, 8, 220, 16}, 2, colors::White);
+    Label title({10, 8, 220, 16}, 2, colors::Alabaster);
     Label sub({10, 28, 200, 8}, 1, colors::Grey);
-    Gauge temp(62, 100, 50, "TEMP C", colors::Orange);
-    Gauge hum(170, 100, 50, "HUM %", colors::Cyan);
+    Gauge temp(62, 100, 50, "TEMP C", colors::Accent);
+    Gauge hum(170, 100, 50, "HUM %", colors::Mint);
     Label batL({236, 56, 80, 8}, 1, colors::Grey);
-    ProgressBar bat({236, 68, 76, 12}, colors::Green);
+    ProgressBar bat({236, 68, 76, 12}, colors::Accent);
     Label upL({236, 96, 80, 8}, 1, colors::Grey);
-    Label up({236, 108, 80, 16}, 2, colors::White);
+    Label up({236, 108, 80, 16}, 2, colors::Alabaster);
     Button btn({236, 140, 76, 26}, "RESET");
     static int16_t samples[96];
-    Graph graph({10, 168, 216, 64}, samples, 96, colors::Green);
+    Graph graph({10, 168, 216, 64}, samples, 96, colors::Accent);
     Label gl({236, 180, 80, 8}, 1, colors::Grey);
-    Label gv({236, 192, 80, 16}, 2, colors::Green);
+    Label gv({236, 192, 80, 16}, 2, colors::Accent);
 
     Screen scr(cv, panel);
     Widget* all[] = {&title, &sub, &temp, &hum, &batL, &bat, &upL, &up, &btn, &graph, &gl, &gv};
     for (Widget* w : all) scr.add(w);
 
-    title.setText("QUASAR HUB");
-    sub.setText("ESP32 - SPI 40 MHz - QuasarUI");
+    title.setText("EUCLASE HUB");
+    sub.setText("ESP32 - SPI 40 MHz - EuclaseUI");
     batL.setText("BATTERY");
     upL.setText("UPTIME s");
     gl.setText("TEMP x10");
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
         temp.setValue(tempC);
         hum.setValue(int(35 + 40 * t));
         bat.setValue(int(100 - 55 * t));
-        bat.setFillColor(t > 0.6f ? colors::Orange : colors::Green);
+        bat.setFillColor(t > 0.6f ? colors::Orange : colors::Accent);
         char buf[16];
         snprintf(buf, sizeof buf, "%d", 1000 + f * 5);
         up.setText(buf);

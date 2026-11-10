@@ -1,6 +1,6 @@
-// QuasarUI by Quasar Soft - umbrella header.
+// EuclaseUI by Euclase - umbrella header.
 #pragma once
-#define QUASARUI_VERSION "0.1.0"
+#define EUCLASEUI_VERSION "0.1.0"
 
 #include "qs_bus.h"
 #include "qs_panel.h"

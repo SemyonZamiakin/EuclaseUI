@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest release of QuasarUI receives security fixes.
+Only the latest release of EuclaseUI receives security fixes.
 
 ## Reporting a vulnerability
 

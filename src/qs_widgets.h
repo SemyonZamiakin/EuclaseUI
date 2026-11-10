@@ -1,4 +1,4 @@
-// QuasarUI - retained-mode widgets. A widget redraws only when its state
+// EuclaseUI - retained-mode widgets. A widget redraws only when its state
 // changed; Screen::update() draws invalid widgets and flushes the dirty rect.
 #pragma once
 #include "qs_canvas.h"
