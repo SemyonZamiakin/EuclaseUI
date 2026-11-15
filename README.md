@@ -46,8 +46,6 @@ Dependency-free C++ UI toolkit for ESP32 / Arduino: RGB565 framebuffer, dirty-re
 
 ## Why dirty rectangles
 
-A full 320x240 frame over 40 MHz SPI takes about 31 ms. A typical dashboard changes one gauge, one label and one chart per tick, not the whole screen.
-
 EuclaseUI keeps an RGB565 framebuffer in RAM, tracks which rectangle each widget touched, and transmits only those rectangles to the panel.
 
 | Scenario (320x240, 40 MHz SPI, simulated) | Pixels sent | SPI time |
