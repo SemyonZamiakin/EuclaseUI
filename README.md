@@ -1,17 +1,50 @@
+<div align="center">
+
 # EuclaseUI
 
-Dependency-free C++ UI toolkit for SPI TFT displays (ESP32 / Arduino): RGB565 framebuffer, dirty-rectangle flushing, and a small set of widgets.
+**Smooth UI on cheap SPI displays: send only the pixels that changed.**
+Dependency-free C++ UI toolkit for ESP32 / Arduino: RGB565 framebuffer, dirty-rectangle flushing and a small set of widgets.
 
 [![CI](https://github.com/SemyonZamiakin/EuclaseUI/actions/workflows/ci.yml/badge.svg)](https://github.com/SemyonZamiakin/EuclaseUI/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-2DD4BF?labelColor=0F2933)
 ![language](https://img.shields.io/badge/C%2B%2B-11-2DD4BF?labelColor=0F2933)
 ![panels](https://img.shields.io/badge/panels-ST7789%20%7C%20ILI9341-2DD4BF?labelColor=0F2933)
+![version](https://img.shields.io/badge/version-0.1.0-2DD4BF?labelColor=0F2933)
 
 <img src="docs/img/demo.gif" width="480" alt="EuclaseUI demo dashboard rendered by the host simulator">
 
-*Output of the bundled host simulator running the library code against a virtual ILI9341 (2x upscaled). These are not photographs of hardware; see [Status](#status).*
+<sub>Output of the bundled host simulator running the library code against a virtual ILI9341 (2x upscaled). These are not photographs of hardware; see <a href="#status">Status</a>.</sub>
 
-## Overview
+[Quick start](#quick-start-arduino-esp32) · [Use cases](#overview--use-cases) · [Design](#design) · [Status](#status)
+
+</div>
+
+<p align="center"><img src="docs/img/divider.png" width="100%" alt=""></p>
+
+## Overview & Use Cases
+
+> **In one sentence:** EuclaseUI draws gauges, graphs and labels on cheap SPI displays for ESP32 and Arduino, and sends only the rectangles that changed, so a dashboard updates smoothly instead of redrawing the whole screen every frame.
+
+**Why it exists.** A full 320x240 frame over 40 MHz SPI takes about 31 ms, so redrawing everything caps a display at ~30 frames per second and keeps the bus busy. A typical dashboard changes one gauge, one label and one chart per tick. EuclaseUI tracks what each widget touched and transmits only that.
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><b>PC stats on your desk</b><br><sub>Show CPU and GPU numbers from Euclase Monitor's HTTP export on a small screen (example in the Monitor docs).</sub></td>
+    <td width="33%" valign="top"><b>Smart-home panels</b><br><sub>Temperature, humidity or power use on a wall or desk display.</sub></td>
+    <td width="33%" valign="top"><b>Device dashboards</b><br><sub>Status screens for 3D printers, robots or test rigs.</sub></td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top"><b>Fast UI on a slow bus</b><br><sub>Only changed rectangles cross the SPI bus; an idle frame sends nothing.</sub></td>
+    <td width="33%" valign="top"><b>No heap, no dependencies</b><br><sub>The caller owns the framebuffer; any SPI layer plugs in through a five-method interface.</sub></td>
+    <td width="33%" valign="top"><b>Learn embedded graphics</b><br><sub>The host simulator renders to images, and the tests check exactly what would reach the glass, no board needed.</sub></td>
+  </tr>
+</table>
+
+**New here?** Start with the [Quick start](#quick-start-arduino-esp32), or build the simulator on a PC ([Build and test on a PC](#build-and-test-on-a-pc)). Note: the library is not yet verified on real hardware; see [Status](#status).
+
+<p align="center"><img src="docs/img/divider.png" width="100%" alt=""></p>
+
+## Why dirty rectangles
 
 A full 320x240 frame over 40 MHz SPI takes about 31 ms. A typical dashboard changes one gauge, one label and one chart per tick, not the whole screen.
 
